@@ -1,0 +1,81 @@
+﻿@using System.Web.Mvc.Html
+@using System.Web.Optimization
+@model EPiServer.Reference.Commerce.Site.Features.Budgeting.ViewModels.BudgetingPageViewModel
+
+<div class="container">
+    <div class="row myPage">
+        @Html.Partial("_CmsNavigation", Model.CurrentPage)
+        <main class="col-xs-12 col-sm-9">
+            <div class="spacer-left-l">
+                @{ Html.RenderAction("Index", "B2BNavigation");}
+                <section class="spacer-bottom-l">
+                    <div class="section-title spacer-bottom-l">
+                        @if (@Model.IsSubOrganization)
+                        {
+                            <h2 class="h3">New Suborganization budget</h2>
+                        }
+                        else
+                        {
+                            <h2 class="h3">New organization budget</h2>
+                        }
+                    </div>
+                    @using (Html.BeginForm("NewBudget", "BudgetingPage", FormMethod.Post))
+                    {
+                        <div class="form-group">
+                            <label class="col-sm-2">Currency</label>
+                            <div class="custom-select">
+                                <span class="custom-select-split"></span>
+                                <span class="custom-select-arrow arrow-down"></span>
+                                <select id="currencyBudget">
+                                    @foreach (var option in Model.AvailableCurrencies)
+                                    {
+                                    <option value="@option">@option</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2">Allocated</label>
+                            <input id="amount" type="text" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2">Start date</label>
+                            <div class="custom-date-input">
+                                <input type="text" id="startDate" class="form-control"/>
+                                <span class="icon-calendar glyphicon glyphicon-calendar"></span>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2">Due date</label>
+                            <div class="custom-date-input">
+                                <input type="text" id="dueDate" class="form-control"/>
+                                <span class="icon-calendar glyphicon glyphicon-calendar"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2">Status</label>
+                            <div class="custom-select">
+                                <span class="custom-select-split"></span>
+                                <span class="custom-select-arrow arrow-down"></span>
+                                <select id="statusBudget">
+                                    <option value="Planned" selected="selected">Planned</option>
+                                    <option value="OnHold">OnHold</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="spacer-top-l">
+                            <button type="button" class="btn btn-primary jsNewBudget">Save</button>
+                            <a href="@Url.Action("Index", "BudgetingPage")" class="btn btn-default cancelNewBudget">Cancel</a>
+                        </div>
+                    }
+                    <div id="BudgetWarningMessage" class="col-md-5 col-xs-12 alert alert-danger pull-right" hidden>
+                        <button type="button" class="close" data-hide="alert">&times;</button>
+                        <span class="warning-message warning-message-data"></span>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</div>

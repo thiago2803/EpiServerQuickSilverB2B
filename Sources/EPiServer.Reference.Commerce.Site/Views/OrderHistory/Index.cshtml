@@ -1,0 +1,41 @@
+﻿@using EPiServer.Commerce.Order
+@using EPiServer.Reference.Commerce.Site.B2B
+@using EPiServer.Reference.Commerce.Site.B2B.Enums
+@using EPiServer.Reference.Commerce.Site.Features.Shared.Extensions
+@model EPiServer.Reference.Commerce.Site.Features.OrderHistory.ViewModels.OrderHistoryViewModel
+
+<div class="container">
+    <div class="row">
+        @Html.Partial("_CmsNavigation", Model.CurrentPage)
+        <div class="col-xs-12 col-sm-9">
+            <div class="spacer-left-l">
+                <div class="section-box">
+                    <h2>@Html.PropertyFor(x => x.CurrentPage.Name)</h2>
+                    @Html.PropertyFor(x => x.CurrentPage.MainBody)
+                </div>
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>@Html.Translate("/OrderHistory/Labels/OrderID")</th>
+                            <th>@Html.Translate("/OrderHistory/Labels/OrderDate")</th>
+                            <th>@Html.Translate("/OrderHistory/Labels/Amount")</th>
+                            <th>@Html.Translate("/OrderHistory/Labels/Status")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.Orders)
+                        {
+                            <tr class="orderElement @(order.QuoteStatus ?? order.PurchaseOrder.OrderStatus.ToString())">
+                                <td><a href="@(Model.OrderDetailsPageUrl)?orderGroupId=@order.OrderGroupId">#@order.PurchaseOrder.OrderNumber</a></td>
+                                <td>@order.PurchaseOrder.Created.ToLongDateString()</td>
+                                <td>@order.PurchaseOrder.GetTotal().ToString()</td>
+                                <td>@(order.QuoteStatus ?? order.PurchaseOrder.OrderStatus.ToString())</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

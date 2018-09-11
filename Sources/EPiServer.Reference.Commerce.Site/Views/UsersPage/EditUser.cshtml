@@ -1,0 +1,67 @@
+﻿@model EPiServer.Reference.Commerce.Site.Features.Users.ViewModels.UsersPageViewModel
+<div class="container">
+    <div class="row myPage">
+        @Html.Partial("_CmsNavigation", Model.CurrentPage)
+        <main class="col-xs-12 col-sm-9">
+            <div class="spacer-left-l">
+                @{ Html.RenderAction("Index", "B2BNavigation");}
+                <section class="spacer-bottom-l">
+                    <div class="section-title spacer-bottom-l">
+                        <h2 class="h3">Editing user role</h2>
+                    </div>
+                        @using (Html.BeginForm("UpdateUser", "UsersPage", FormMethod.Post, new {@id = "editUserForm"}))
+                        {
+                            <div class="form-group">
+                                <label>Name</label>
+                                <br/>
+                                @Html.TextBoxFor(x => x.Contact.FullName, new {disabled = "disabled"})
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <br/>
+                                @Html.TextBoxFor(x => x.Contact.Email, new {disabled = "disabled"})
+                            </div>
+                            <div class="form-group">
+                                <label>Organization</label>
+                                <br/>
+                                <div class="custom-select">
+                                    <span class="custom-select-split"></span>
+                                    <span class="custom-select-arrow arrow-down"></span>
+                                    @Html.TextBoxFor(x => x.Contact.Organization.Name, new { disabled = "disabled" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Role</label>
+                                <br/>
+                                <div class="custom-select">
+                                    <span class="custom-select-split"></span>
+                                    <span class="custom-select-arrow arrow-down"></span>
+                                    @Html.DropDownListFor(m => m.Contact.UserRole, new SelectList(new List<SelectListItem>
+                                    {
+                                        new SelectListItem {Text = "Approver", Value = "Approver"},
+                                        new SelectListItem {Text = "Purchaser", Value = "Purchaser"}
+                                    }, "Value", "Text", Model.Contact.UserRole))
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Location</label>
+                                <br/>
+                                <div class="custom-select">
+                                    <span class="custom-select-split"></span>
+                                    <span class="custom-select-arrow arrow-down"></span>
+                                    @Html.DropDownListFor(
+                                        model => model.Contact.Location,
+                                        new SelectList(Model.SubOrganization.Locations, "AddressId", "Name", Model.Contact.Location), new { @id = "select-location" })
+                                </div>
+                            </div>
+                            <div class="spacer-top-l">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <a href="@Url.Action("Index", "UsersPage")" class="btn btn-default">Cancel</a>
+                            </div>
+                            @Html.HiddenFor(m => m.Contact.ContactId)
+                        }
+                </section>
+            </div>
+        </main>
+    </div>
+</div>

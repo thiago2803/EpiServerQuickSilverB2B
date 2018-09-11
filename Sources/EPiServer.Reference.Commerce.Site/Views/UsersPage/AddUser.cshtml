@@ -1,0 +1,97 @@
+﻿@using EPiServer.Reference.Commerce.Site.B2B.Enums
+@model EPiServer.Reference.Commerce.Site.Features.Users.ViewModels.UsersPageViewModel
+<div class="container">
+    <div class="row myPage">
+        @Html.Partial("_CmsNavigation", Model.CurrentPage)
+        <main class="col-xs-12 col-sm-9">
+            <div class="spacer-left-l">
+                @{ Html.RenderAction("Index", "B2BNavigation");}
+                <section class="spacer-bottom-l">
+                    <div class="section-title spacer-bottom-l">
+                        <h2 class="h3">Look up user or fill in their details</h2>
+                    </div>
+                    <div class="custom-search">
+                        <input type="text" id="addUsersAutocomplete" autocomplete="off" placeholder="search for users" />
+                        <span class="js-reset-icon close-icon" style="display:none"></span>
+                        <span class="js-search-icon icon-search glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </div>
+                    <button class="btn js-autocomplete-result" type="button" style="display:none">
+                        <span class="js-user-name v-align-middle"></span><span class="js-close-icon close-icon v-align-middle"></span>
+                    </button>
+                </section>
+                <section class="spacer-bottom-l">
+                    <div class="section-title spacer-bottom-l">
+                        <h2 class="h3">User Details</h2>
+                    </div>
+                    @using (Html.BeginForm("AddUser", "UsersPage", FormMethod.Post, new { @id = "addUserForm" }))
+                    {
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Contact.FirstName)
+                            <br />
+                            @Html.TextBoxFor(x => x.Contact.FirstName)
+                            @Html.ValidationMessageFor(x => x.Contact.FirstName)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Contact.LastName)
+                            <br />
+                            @Html.TextBoxFor(x => x.Contact.LastName)
+                            @Html.ValidationMessageFor(x => x.Contact.LastName)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Contact.Email)
+                            <br />
+                            @Html.TextBoxFor(x => x.Contact.Email)
+                            @Html.ValidationMessageFor(x => x.Contact.Email)
+                        </div>
+                        <div class="form-group" id="organization-div" style="display: none">
+                            @Html.LabelFor(x => x.Contact.Organization, "Sub-Organization")
+                            <br />
+                            <div class="custom-select">
+                                <span class="custom-select-split"></span>
+                                <span class="custom-select-arrow arrow-down"></span>
+                                @Html.DropDownListFor(model => model.Contact.OrganizationId, new SelectList(Model.Organizations, "OrganizationId", "Name", Model.Contact.OrganizationId), new { @id = "select-suborganization" })
+                                @Html.ValidationMessageFor(model => model.Contact.OrganizationId)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Role</label>
+                            <br />
+                            <div class="custom-select">
+                                <span class="custom-select-split"></span>
+                                <span class="custom-select-arrow arrow-down"></span>
+                                @Html.DropDownListFor(m => m.Contact.UserRole, new SelectList(new List<SelectListItem>
+                                {
+                                    new SelectListItem { Text = "Admin", Value = "Admin" },
+                                    new SelectListItem { Text = "Approver", Value = "Approver" },
+                                    new SelectListItem { Text = "Purchaser", Value = "Purchaser" }
+                                }, "Value", "Text", Model.Contact.UserRole), new { @id = "select-role" })
+                            </div>
+                        </div>
+                        <div class="form-group" id="location-div" style="display: none">
+                            <label>@Html.LabelFor(x => x.Contact.Location)</label>
+                            <br />
+                            <div class="custom-select">
+                                <span class="custom-select-split"></span>
+                                <span class="custom-select-arrow arrow-down"></span>
+                                @Html.DropDownListFor(model => model.Contact.Location, new List<SelectListItem>(), "Select Location", new {@id = "select-location"})
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Contact.Location)
+                        </div>
+
+                        if (Model.Contact.ShowOrganizationError)
+                        {
+                            <div class="form-group">
+                                <p class="text-danger">This user is already part of an organization.</p>
+                            </div>
+                        }
+
+                        <div class="spacer-top-l">
+                            <button type="submit" class="btn btn-primary">Add</button>
+                            <a href="@Url.Action("Index", "UsersPage")" class="btn btn-default">Cancel</a>
+                        </div>
+                    }
+                </section>
+            </div>
+        </main>
+    </div>
+</div>

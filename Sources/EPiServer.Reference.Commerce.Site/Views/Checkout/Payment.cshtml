@@ -1,0 +1,29 @@
+﻿@using EPiServer.Reference.Commerce.Site.B2B.Enums
+@model EPiServer.Reference.Commerce.Site.Features.Checkout.ViewModels.CheckoutViewModel
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        <div class="jsPaymentMethod">
+            @if (Model.Payment != null)
+            {
+                var controller = string.Format("_{0}PaymentMethod", Model.Payment.SystemName);
+
+                Html.RenderPartial(controller, Model.Payment);
+            }
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-6">
+        <h4>@Html.Translate("/Checkout/Payment/Labels/ChoosePayment")</h4>
+        @foreach (var method in Model.PaymentMethodViewModels)
+        {
+            <div class="radio">
+                <label>
+                    @{ string checkState = method.SystemName == Model.Payment.SystemName ? "checked" : string.Empty; }
+                    <input type="radio" class="jsChangePayment" name="SystemName" value="@method.SystemName" @checkState/> @method.FriendlyName
+                </label>
+            </div>
+        }
+    </div>
+</div>

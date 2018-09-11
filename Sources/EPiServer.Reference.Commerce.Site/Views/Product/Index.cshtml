@@ -1,0 +1,254 @@
+﻿@model EPiServer.Reference.Commerce.Site.Features.Product.ViewModels.BaseProductViewModel
+<div class="product-component jsProductDetails">
+    <div class="row spacer-bottom-l">
+        <div class="col-xs-12">
+            <ul class="breadcrumb">
+                <li><a href="/">Home</a></li>
+                <li><a href="@Url.ContentUrl(Model.CategoryPage.ContentLink)">@Model.CategoryPage.DisplayName</a></li>
+                <li><a href="@Url.ContentUrl(Model.SubcategoryPage.ContentLink)">@Model.SubcategoryPage.DisplayName</a></li>
+            </ul>
+            <h1>@Html.PropertyFor(x => x.Variation.DisplayName)</h1>
+            <span class="item-data">brand <strong>@Html.PropertyFor(x => x.Product.Brand)</strong></span>
+            <span class="item-data">item no. <strong>@Html.PropertyFor(x => x.Variation.Code)</strong></span>
+        </div>
+    </div>
+    <div class="row spacer-bottom-l">
+        <div class="col-xs-12 col-sm-4 col--leading">
+            <div id="product-carousel" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner" role="listbox">
+                    @for (var i = 0; i < Model.Images.Count; i++)
+                    {
+                        <div class="item" data-slide-number="@i">
+                            <img src="@Model.Images.ElementAt(i)" />
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="row" id="carousel-thumbs">
+                <ul class="carousel-thumbs js-carousel-thumbs">
+                    @for (var i = 0; i < Model.Images.Count; i++)
+                    {
+                        <li class="col-xs-3">
+                            <a href="#" class="thumbnail js-thumbnail" id="@i"><img src="@Model.Images.ElementAt(i)" /></a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 spacer-top-l">
+                    <h2 class="spacer-bottom-m">Specifications</h2>
+                    <p>
+                        @Html.PropertyFor(x => x.Product.Description)
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-8 product-info">
+            <div class="row spacer-bottom-l">
+                <div class="col-xs-12 col-sm-4">
+                    @if (Model.IsAvailable)
+                    {
+                        <p class="spacer-bottom-m"><span class="label label-success">IN STOCK</span></p>
+                        if (Model.DiscountedPrice.HasValue && Model.DiscountedPrice.Value < Model.ListingPrice)
+                        {
+                            <div class="product-price spacer-bottom-m">
+                                <span class="product-price__label">LIST PRICE</span>
+                                <span class="product-price__amount float-right text-line-through">@Helpers.RenderMoney(Model.ListingPrice)</span>
+                            </div>
+                            <div class="product-price large-text spacer-bottom-m">
+                                <span class="product-price__label">YOUR PRICE</span>
+                                <span class="product-price__discounted-amount float-right">@Helpers.RenderMoney(Model.DiscountedPrice.Value)</span>
+                            </div>
+                            <div class="product-price">
+                                <span class="product-price__label">YOU SAVE</span>
+                                <span class="product-price__amount float-right">@Helpers.RenderMoney(Model.SavePrice)</span>
+                            </div>
+
+                        }
+                        else
+                        {
+                            <div class="product-price">
+                                <span class="product-price__label">LIST PRICE</span>
+                                <span class="product-price__amount float-right">@Helpers.RenderMoney(Model.ListingPrice)</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="spacer-bottom-m"><span class="label label-danger">OUT OF STOCK</span></p>
+                        <div class="product-price">
+                            <span class="product-price__label">@Html.Translate("/Product/NotAvailable")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                @using (Html.BeginForm("SelectVariant", "Product", FormMethod.Post, new { @class = "product-details__form clearfix" }))
+                {
+                    <div class="col-xs-12 col-sm-4 spacer-bottom-l">
+                        <div class="spacer-bottom-m">
+                            @*<label for="Color">@Html.Translate("/ProductPage/VariationSelection/Color")</label><br />*@
+                            <div class="custom-select full-width">
+                                <span class="custom-select-split"></span>
+                                <span class="custom-select-arrow arrow-down"></span>
+                                @Html.DropDownListFor(x => x.Color, Model.Colors, new { @class = "full-width jsVariationSwitch" })
+                            </div>
+                        </div>
+                        <div class="spacer-bottom-l">
+                            @*<label for="Size">@Html.Translate("/ProductPage/VariationSelection/Size")</label><br />*@
+                            <div class="custom-select full-width">
+                                <span class="custom-select-split"></span>
+                                <span class="custom-select-arrow arrow-down"></span>
+                                @Html.DropDownListFor(x => x.Size, Model.Sizes, new { @class = "full-width jsVariationSwitch" })
+                            </div>
+                        </div>
+                        <div class="product-price large-text">
+                            <span class="product-price__label">TOTAL PRICE</span>
+                            <span class="product-price__total-amount float-right">@Helpers.RenderMoney(Model.DiscountedPrice.Value)</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 spacer-bottom-l">
+
+                    @if (Model.IsAvailable && !(bool)ViewData["IsReadOnly"])
+                    {
+                        using (Html.BeginForm("AddToCart", "Cart", FormMethod.Post, new { @class = "form-inline", data_container = "MiniCart" }))
+                        {
+                            @Html.Hidden("code", Model.Variation.Code)
+                            <button type="submit" role="button" class="btn btn-danger btn-empty jsAddToCart" data-container="MiniCart"><span class="fa fa-shopping-cart fa-2x v-align-middle spacer-right-m"></span> @Html.Translate("/Product/Button/AddToCart")</button>
+                        }
+                        if (User.Identity.IsAuthenticated)
+                        {
+                            using (Html.BeginForm("AddToCart", "WishList", FormMethod.Post, new { @class = "form-inline jsAddToWishList", data_container = "WishListMiniCart" }))
+                            {
+                                @Html.Hidden("code", Model.Variation.Code)
+                                <button type="submit" role="button" class="btn btn-default jsAddToCart spacer-left-s" data-container="WishListMiniCart"><span class="fa fa-star fa-2x v-align-middle spacer-right-m"></span> @Html.Translate("/Product/Button/AddToWishList")</button>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 spacer-top-l">
+                    <h2 class="spacer-bottom-m">Description</h2>
+                    @Html.PropertyFor(x => x.Product.LongDescription)
+                </div>
+            </div>
+            <div class="row">
+                <div id="CartWarningMessage" class="col-md-5 col-xs-12 alert alert-danger pull-right" hidden>
+                    <button type="button" class="close" data-hide="alert">&times;</button>
+                    <span class="warning-message"></span>
+                </div>
+                <div id="CartQuoteSucceedMessage" class="col-md-5 col-xs-12 alert alert-success pull-right" hidden>
+                    <button type="button" class="close" data-hide="alert">&times;</button>
+                    <span class="success-message"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.PropertyFor(m => m.ContentArea, new { CssClass = "row" })
+
+    @if (Model.Variants != null && Model.Variants.Any())
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                <h2 class="h1 spacer-bottom-l">Select multiple</h2>
+                <div class="row">
+                    <div class="col-sm-9 product-table-wrapper">
+                        <table class="product-table table table-stripped">
+                            <thead>
+                                <tr>
+                                    <th>item</th>
+                                    <th>size</th>
+                                    <th>sku</th>
+                                    <th>stock</th>
+                                    <th class="price-column">your price / unit</th>
+                                    <th class="quantity-column">quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var variant in Model.Variants)
+                                {
+                                    var isDiscountedPrice = variant.DiscountedPrice.HasValue && variant.DiscountedPrice.Value < variant.ListingPrice;
+                                    <tr class="variant-row">
+                                        <td><img class="product-image" src="@variant.ImageUrl" /></td>
+                                        <td>@variant.Size</td>
+                                        <td class="product-sku">@variant.Sku</td>
+                                        <td>@variant.StockQuantity</td>
+                                        <td>
+                                            <div class="product-price spacer-bottom-s">
+                                                @if (isDiscountedPrice)
+                                                {
+                                                    <span name="ListingPrice" class="product-price__amount text-line-through">@Helpers.RenderMoney(variant.ListingPrice)</span>
+                                                }
+                                                <span name="DiscountedPrice" class="product-price__discounted-amount spacer-left-m">@Helpers.RenderMoney(variant.YourPrice)</span>
+                                            </div>
+                                            @if (isDiscountedPrice)
+                                            {
+                                                <p class="product-price__save-amount">You save @Helpers.RenderMoney(variant.SavePrice)</p>
+                                            }
+                                        </td>
+                                        <td><input type="text" name="item-quantity" class="item-quantity" value=@variant.Quantity></td>
+                                        @Html.Hidden("CurrentCurrency", variant.YourPrice.Currency.Format.CurrencySymbol)
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="product-table-summary spacer-left-m">
+                            <div class="spacer-bottom-l">
+                                <p class="product-price text-right text-line-through">
+                                    <span name="TotalListingPrice" class="product-price__amount"></span>
+                                </p>
+                                <p class="product-price large-text">
+                                    <span class="product-price__label">TOTAL PRICE</span>
+                                    <span name="TotalDiscountedPrice" class="product-price__discounted-amount float-right">$0.00</span>
+                                </p>
+                                <p name="YouSave" class="text-right">
+                                    <span class="you-save"></span>
+                                </p>
+                            </div>
+                            <button id="AddToCartButton" type="submit" role="button" class="btn btn-danger btn-empty text-left full-width spacer-bottom-s" data-container="MiniCart"><span class="fa fa-shopping-cart fa-2x v-align-middle spacer-right-m"></span> @Html.Translate("/Product/Button/AddToCart")</button>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <button id="AddToOrderPadButton" type="submit" role="button" class="btn btn-default full-width text-left" data-container="WishListMiniCart"><span class="fa fa-star fa-2x v-align-middle spacer-right-m"></span> @Html.Translate("/Product/Button/AddToWishList")</button>
+                            }
+                            @if (Model.ReturnedMessages != null && Model.ReturnedMessages.Count > 0)
+                            {
+                                <div class="text-danger bg-danger padded-m spacer-top-m">
+                                    @foreach (var message in Model.ReturnedMessages)
+                                    {
+                                        <p>* @message</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @section Meta {
+        @if (Model != null)
+    {
+        if (!String.IsNullOrEmpty(Model.Product.SeoInformation.Description))
+        {
+                <meta property="description" content="@Html.AttributeEncode(Model.Product.SeoInformation.Description)" />
+            }
+            else if (Model.Product.Description != null && !Model.Product.Description.IsEmpty)
+            {
+                <meta property="description" content="@Html.AttributeEncode(Model.Product.Description)" />
+            }
+            if (!String.IsNullOrEmpty(Model.Product.SeoInformation.Keywords))
+            {
+                <meta property="keywords" content="@Html.AttributeEncode(Model.Product.SeoInformation.Keywords)" />
+            }
+        }
+    }
+</div>

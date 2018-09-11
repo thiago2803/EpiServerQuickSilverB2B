@@ -1,0 +1,55 @@
+﻿@model EPiServer.Reference.Commerce.Site.Features.Orders.ViewModels.OrdersPageViewModel
+<div class="container">
+    <div class="row myPage">
+        @Html.Partial("_CmsNavigation", Model.CurrentPage)
+        <main class="col-xs-12 col-sm-9">
+            <div class="spacer-left-l">
+                @{ Html.RenderAction("Index", "B2BNavigation");}
+                <section>
+                    <div class="section-title spacer-bottom-m">
+                        <label>Filter by status:</label>
+                    </div>
+                    <div class="custom-select spacer-bottom-m">
+                        <span class="custom-select-split"></span>
+                        <span class="custom-select-arrow arrow-down"></span>
+                        <select class="selectpicker orderStatusPicker">
+                            <option value="All">All</option>
+                            <option value="OnHold">On Hold</option>
+                            <option value="InProgress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="RequestQuotation">Request Quote</option>
+                            <option value="RequestQuotationFinished">Request Quote Finished</option>
+                            <option value="QuoteExpired">Quote Expired</option>
+                            <option value="PendingApproval">Pending Approval</option>
+                        </select>
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Order No.</th>
+                            <th>Placed On</th>
+                            <th>Amount</th>
+                            <th>SubOrganization</th>
+                            <th>User</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var order in Model.OrdersOrganization)
+                        {
+                            <tr class="orderElement @order.Status">
+                                <td><a href="@(Model.OrderDetailsPageUrl)?orderGroupId=@order.OrderGroupId">#@order.OrderNumber</a></td>
+                                <td>@order.PlacedOrderDate</td>
+                                <td>@order.Currency @order.Ammount</td>
+                                <td>@order.SubOrganization</td>
+                                <td>@order.User</td>
+                                <td>@order.Status</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+</div>
